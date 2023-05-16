@@ -1,19 +1,140 @@
 {
-  "title": "Todo",
-  "type": "object",
-  "required": [
-    "title"
-  ],
-  "properties": {
-    "title": {
-      "type": "string",
-      "title": "Title",
-      "default": "A new task"
+    "properties": {
+        "access_restriction": {
+            "properties": {
+                "allowed_from": {
+                    "description": "The list of IP networks from where the users are permitted to access this service. To specify the IP addresses or networks, use the IPv4-Address/prefix format, for example, 10.40.0.0/16.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "enabled": {
+                    "type": "boolean"
+                }
+            },
+            "required": [
+                "enabled"
+            ],
+            "type": "object"
+        },
+        "enabled": {
+            "type": "boolean"
+        },
+        "listen": {
+            "items": {
+                "properties": {
+                    "address": {
+                        "type": "string"
+                    },
+                    "port": {
+                        "description": "The port number where this local service accepts connections.",
+                        "maximum": 65535,
+                        "minimum": 1,
+                        "type": "integer"
+                    }
+                },
+                "required": [
+                    "address",
+                    "port"
+                ],
+                "type": "object"
+            },
+            "type": "array"
+        },
+        "system_contact": {
+            "description": "Optional. For example, it can contain the contact information of the SPS administrator.",
+            "type": "string"
+        },
+        "system_description": {
+            "description": "Optional. For example, it can contain information of the SPS host.",
+            "type": "string"
+        },
+        "system_location": {
+            "description": "SNMP server location",
+            "type": "string"
+        },
+        "version_2c": {
+            "description": "Enables and configures SNMP queries using the SNMP v2c protocol. You can have both the SNMP v2c and v3 protocols enabled at the same time.",
+            "properties": {
+                "community": {
+                    "description": "The name of the SNMP community.",
+                    "pattern": "^([a-zA-Z0-9\\-_\\.]{1,4096})$",
+                    "type": "string"
+                },
+                "enabled": {
+                    "type": "boolean"
+                }
+            },
+            "required": [
+                "enabled"
+            ],
+            "type": "object"
+        },
+        "version_3": {
+            "description": "Enables and configures SNMP queries using the SNMP v3 protocol. You can have both the SNMP v2c and v3 protocols enabled at the same time. You must configure an authentication method and a password, encryption is optional.",
+            "properties": {
+                "enabled": {
+                    "type": "boolean"
+                },
+                "users": {
+                    "description": "Contains the configuration parameters for the SNMP v3 protocol.",
+                    "items": {
+                        "properties": {
+                            "auth_method": {
+                                "description": "Configures encrypted communication with the SNMP server.",
+                                "enum": [
+                                    "md5",
+                                    "sha"
+                                ],
+                                "type": "string"
+                            },
+                            "auth_password": {
+                                "description": "References the password used for authenticating to the SNMP server.\nRequired parameter when using SNMP version 3. References the password used for\nauthenticating to the SNMP server.\n\nYou can create passwords at the /api/configuration/passwords/ endpoint.\n\nTo modify or add a password, use the value of the returned key as the value of\nthe password element, and remove any child elements (including the key).\n\nThe referenced password must be at least 8 characters long, and can contain\nletters (a-z, A-Z), numbers (0-9) the special characters\n(!\"#$%&'()*+,;<=&@[\\]^`{|}_./:?-) and the space character.\n",
+                                "type": "string"
+                            },
+                            "encryption_method": {
+                                "description": "Configures encrypted communication with the SNMP server.",
+                                "enum": [
+                                    "aes",
+                                    "des",
+                                    "none"
+                                ],
+                                "type": "string"
+                            },
+                            "encryption_password": {
+                                "description": "Set to null if the value of the encryption_method is set to none. References the password used for encrypting the communication with the SNMP server.\nRequired parameter when using SNMP version 3. References the password used for\nauthenticating to the SNMP server.\n\nYou can create passwords at the /api/configuration/passwords/ endpoint.\n\nTo modify or add a password, use the value of the returned key as the value of\nthe password element, and remove any child elements (including the key).\n\nThe referenced password must be at least 8 characters long, and can contain\nletters (a-z, A-Z), numbers (0-9) the special characters\n(!\"#$%&'()*+,;<=&@[\\]^`{|}_./:?-) and the space character.\n",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "username": {
+                                "description": "The username for sending SNMP traps.",
+                                "pattern": "^([a-zA-Z0-9\\-_\\.]*)$",
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "auth_method",
+                            "auth_password",
+                            "encryption_method",
+                            "encryption_password",
+                            "username"
+                        ],
+                        "type": "object"
+                    },
+                    "type": "array"
+                }
+            },
+            "required": [
+                "enabled"
+            ],
+            "type": "object"
+        }
     },
-    "done": {
-      "type": "boolean",
-      "title": "Done?",
-      "default": false
-    }
-  }
+    "required": [
+        "enabled"
+    ],
+    "type": "object"
 }
