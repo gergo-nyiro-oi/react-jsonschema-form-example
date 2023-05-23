@@ -1,260 +1,252 @@
 {
-    "properties": {
-        "active": {
-            "description": "Indicates whether the login method is enabled or not.",
-            "type": "boolean"
-        },
-        "authentication_protocol": {
-            "description": "RADIUS authentication protocol",
-            "enum": [
-                "chap",
-                "pap"
-            ],
-            "type": "string"
-        },
-        "groups": {
-            "anyOf": [
-                {
-                    "properties": {
-                        "type": {
-                            "description": "The type discriminator field",
-                            "type": "string"
-                        }
-                    },
-                    "required": [
-                        "type"
-                    ],
-                    "type": "object"
-                },
-                {
-                    "properties": {
-                        "ldap_server": {
+    "anyOf": [
+        {
+            "properties": {
+                "access_restriction": {
+                    "anyOf": [
+                        {
                             "properties": {
-                                "key": {
-                                    "type": "string"
-                                },
-                                "meta": {
-                                    "properties": {
-                                        "href": {
-                                            "type": "string"
-                                        }
+                                "allowed_from": {
+                                    "description": "The list of IP networks from where the users are permitted to access this service. To specify the IP addresses or networks, use the IPv4-Address/prefix format, for example, 10.40.0.0/16.",
+                                    "items": {
+                                        "type": "string"
                                     },
-                                    "required": [
-                                        "href"
+                                    "type": "array"
+                                },
+                                "enabled": {
+                                    "default": true,
+                                    "enum": [
+                                        true
                                     ],
-                                    "type": "object"
+                                    "readonly": true,
+                                    "type": "boolean"
                                 }
                             },
                             "required": [
-                                "key",
-                                "meta"
+                                "allowed_from",
+                                "enabled"
                             ],
+                            "title": "enabled",
                             "type": "object"
                         },
-                        "type": {
-                            "description": "The type discriminator field",
-                            "type": "string"
+                        {
+                            "properties": {
+                                "enabled": {
+                                    "default": false,
+                                    "enum": [
+                                        false
+                                    ],
+                                    "readonly": true,
+                                    "type": "boolean"
+                                }
+                            },
+                            "title": "disabled",
+                            "type": "object"
                         }
-                    },
-                    "required": [
-                        "ldap_server",
-                        "type"
+                    ]
+                },
+                "enabled": {
+                    "default": true,
+                    "enum": [
+                        true
                     ],
-                    "type": "object"
-                }
-            ],
-            "description": "The provider of group information which is used for authorizing acess.",
-            "discriminator": {
-                "mapping": {
-                    "ldap": {
+                    "readonly": true,
+                    "type": "boolean"
+                },
+                "listen": {
+                    "items": {
                         "properties": {
-                            "ldap_server": {
-                                "properties": {
-                                    "key": {
-                                        "type": "string"
-                                    },
-                                    "meta": {
+                            "address": {
+                                "type": "string"
+                            },
+                            "port": {
+                                "description": "The port number where this local service accepts connections.",
+                                "maximum": 65535,
+                                "minimum": 1,
+                                "type": "integer"
+                            }
+                        },
+                        "required": [
+                            "address",
+                            "port"
+                        ],
+                        "type": "object"
+                    },
+                    "type": "array"
+                },
+                "system_contact": {
+                    "description": "Optional. For example, it can contain the contact information of the SPS administrator.",
+                    "type": "string"
+                },
+                "system_description": {
+                    "description": "Optional. For example, it can contain information of the SPS host.",
+                    "type": "string"
+                },
+                "system_location": {
+                    "description": "SNMP server location",
+                    "type": "string"
+                },
+                "version_2c": {
+                    "anyOf": [
+                        {
+                            "properties": {
+                                "community": {
+                                    "description": "The name of the SNMP community.",
+                                    "pattern": "^([a-zA-Z0-9\\-_\\.]{1,4096})$",
+                                    "type": "string"
+                                },
+                                "enabled": {
+                                    "default": true,
+                                    "enum": [
+                                        true
+                                    ],
+                                    "readonly": true,
+                                    "type": "boolean"
+                                }
+                            },
+                            "required": [
+                                "community",
+                                "enabled"
+                            ],
+                            "title": "enabled",
+                            "type": "object"
+                        },
+                        {
+                            "properties": {
+                                "enabled": {
+                                    "default": false,
+                                    "enum": [
+                                        false
+                                    ],
+                                    "readonly": true,
+                                    "type": "boolean"
+                                }
+                            },
+                            "title": "disabled",
+                            "type": "object"
+                        }
+                    ],
+                    "description": "Enables and configures SNMP queries using the SNMP v2c protocol. You can have both the SNMP v2c and v3 protocols enabled at the same time."
+                },
+                "version_3": {
+                    "anyOf": [
+                        {
+                            "properties": {
+                                "enabled": {
+                                    "default": true,
+                                    "enum": [
+                                        true
+                                    ],
+                                    "readonly": true,
+                                    "type": "boolean"
+                                },
+                                "users": {
+                                    "description": "Contains the configuration parameters for the SNMP v3 protocol.",
+                                    "items": {
                                         "properties": {
-                                            "href": {
+                                            "auth_method": {
+                                                "description": "Configures encrypted communication with the SNMP server.",
+                                                "enum": [
+                                                    "md5",
+                                                    "sha"
+                                                ],
+                                                "type": "string"
+                                            },
+                                            "auth_password": {
+                                                "description": "References the password used for authenticating to the SNMP server.\nRequired parameter when using SNMP version 3. References the password used for\nauthenticating to the SNMP server.\n\nYou can create passwords at the /api/configuration/passwords/ endpoint.\n\nTo modify or add a password, use the value of the returned key as the value of\nthe password element, and remove any child elements (including the key).\n\nThe referenced password must be at least 8 characters long, and can contain\nletters (a-z, A-Z), numbers (0-9) the special characters\n(!\"#$%&'()*+,;<=&@[\\]^`{|}_./:?-) and the space character.\n",
+                                                "type": "string"
+                                            },
+                                            "encryption_method": {
+                                                "description": "Configures encrypted communication with the SNMP server.",
+                                                "enum": [
+                                                    "aes",
+                                                    "des",
+                                                    "none"
+                                                ],
+                                                "type": "string"
+                                            },
+                                            "encryption_password": {
+                                                "anyOf": [
+                                                    {
+                                                        "description": "Set to null if the value of the encryption_method is set to none. References the password used for encrypting the communication with the SNMP server.\nRequired parameter when using SNMP version 3. References the password used for\nauthenticating to the SNMP server.\n\nYou can create passwords at the /api/configuration/passwords/ endpoint.\n\nTo modify or add a password, use the value of the returned key as the value of\nthe password element, and remove any child elements (including the key).\n\nThe referenced password must be at least 8 characters long, and can contain\nletters (a-z, A-Z), numbers (0-9) the special characters\n(!\"#$%&'()*+,;<=&@[\\]^`{|}_./:?-) and the space character.\n",
+                                                        "title": "enabled",
+                                                        "type": "string"
+                                                    },
+                                                    {
+                                                        "title": "disabled",
+                                                        "type": "null"
+                                                    }
+                                                ]
+                                            },
+                                            "username": {
+                                                "description": "The username for sending SNMP traps.",
+                                                "pattern": "^([a-zA-Z0-9\\-_\\.]*)$",
                                                 "type": "string"
                                             }
                                         },
                                         "required": [
-                                            "href"
+                                            "auth_method",
+                                            "auth_password",
+                                            "encryption_method",
+                                            "encryption_password",
+                                            "username"
                                         ],
                                         "type": "object"
-                                    }
-                                },
-                                "required": [
-                                    "key",
-                                    "meta"
-                                ],
-                                "type": "object"
-                            },
-                            "type": {
-                                "description": "The type discriminator field",
-                                "type": "string"
-                            }
-                        },
-                        "required": [
-                            "ldap_server",
-                            "type"
-                        ],
-                        "type": "object"
-                    },
-                    "local": {
-                        "properties": {
-                            "type": {
-                                "description": "The type discriminator field",
-                                "type": "string"
-                            }
-                        },
-                        "required": [
-                            "type"
-                        ],
-                        "type": "object"
-                    }
-                },
-                "propertyName": "type"
-            }
-        },
-        "name": {
-            "description": "A unique identifier of the login method.",
-            "pattern": "^([a-zA-Z0-9\\-_\\.]{1,4096})$",
-            "type": "string"
-        },
-        "servers": {
-            "items": {
-                "properties": {
-                    "address": {
-                        "anyOf": [
-                            {
-                                "properties": {
-                                    "selection": {
-                                        "type": "string"
                                     },
-                                    "value": {
-                                        "type": "string"
-                                    }
-                                },
-                                "required": [
-                                    "selection",
-                                    "value"
-                                ],
-                                "type": "object"
-                            },
-                            {
-                                "properties": {
-                                    "selection": {
-                                        "type": "string"
-                                    },
-                                    "value": {
-                                        "pattern": "^(([a-z0-9\\-]+)(\\.([a-z0-9\\-]+))*)$",
-                                        "type": "string"
-                                    }
-                                },
-                                "required": [
-                                    "selection",
-                                    "value"
-                                ],
-                                "type": "object"
-                            }
-                        ],
-                        "description": "Defines the address of a RADIUS server. Possible values are:\n* ip\n  The value element contains the IP of the RADIUS server.\n* fqdn\n  The value element contains the FQDN of the RADIUS server.\n",
-                        "discriminator": {
-                            "mapping": {
-                                "fqdn": {
-                                    "properties": {
-                                        "selection": {
-                                            "type": "string"
-                                        },
-                                        "value": {
-                                            "pattern": "^(([a-z0-9\\-]+)(\\.([a-z0-9\\-]+))*)$",
-                                            "type": "string"
-                                        }
-                                    },
-                                    "required": [
-                                        "selection",
-                                        "value"
-                                    ],
-                                    "type": "object"
-                                },
-                                "ip": {
-                                    "properties": {
-                                        "selection": {
-                                            "type": "string"
-                                        },
-                                        "value": {
-                                            "type": "string"
-                                        }
-                                    },
-                                    "required": [
-                                        "selection",
-                                        "value"
-                                    ],
-                                    "type": "object"
+                                    "type": "array"
                                 }
                             },
-                            "propertyName": "selection"
-                        }
-                    },
-                    "port": {
-                        "description": "The port number of the RADIUS server.",
-                        "maximum": 65535,
-                        "minimum": 1,
-                        "type": "integer"
-                    },
-                    "shared_secret": {
-                        "properties": {
-                            "key": {
-                                "type": "string"
-                            },
-                            "meta": {
-                                "properties": {
-                                    "href": {
-                                        "type": "string"
-                                    }
-                                },
-                                "required": [
-                                    "href"
-                                ],
-                                "type": "object"
-                            }
+                            "required": [
+                                "users",
+                                "enabled"
+                            ],
+                            "title": "enabled",
+                            "type": "object"
                         },
-                        "required": [
-                            "key",
-                            "meta"
-                        ],
-                        "type": "object"
-                    }
-                },
-                "required": [
-                    "address",
-                    "port",
-                    "shared_secret"
-                ],
-                "type": "object"
+                        {
+                            "properties": {
+                                "enabled": {
+                                    "default": false,
+                                    "enum": [
+                                        false
+                                    ],
+                                    "readonly": true,
+                                    "type": "boolean"
+                                }
+                            },
+                            "title": "disabled",
+                            "type": "object"
+                        }
+                    ],
+                    "description": "Enables and configures SNMP queries using the SNMP v3 protocol. You can have both the SNMP v2c and v3 protocols enabled at the same time. You must configure an authentication method and a password, encryption is optional."
+                }
             },
-            "type": "array"
+            "required": [
+                "access_restriction",
+                "listen",
+                "system_contact",
+                "system_description",
+                "system_location",
+                "version_2c",
+                "version_3",
+                "enabled"
+            ],
+            "title": "enabled",
+            "type": "object"
         },
-        "title": {
-            "description": "The title that appears above the login method button on the SPS web interface. This can be customized.",
-            "pattern": "^(.+)$",
-            "type": "string"
-        },
-        "type": {
-            "description": "The type discriminator field",
-            "type": "string"
+        {
+            "properties": {
+                "enabled": {
+                    "default": false,
+                    "enum": [
+                        false
+                    ],
+                    "readonly": true,
+                    "type": "boolean"
+                }
+            },
+            "title": "disabled",
+            "type": "object"
         }
-    },
-    "required": [
-        "active",
-        "authentication_protocol",
-        "groups",
-        "name",
-        "servers",
-        "title",
-        "type"
-    ],
-    "type": "object"
+    ]
 }
